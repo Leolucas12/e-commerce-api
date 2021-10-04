@@ -1,0 +1,366 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Shop API",
+		"description": "API para manipular produtos.",
+		"contact": {
+			"email": "santos.leandro.contact@gmail.com"
+		},
+		"version": "1.0.0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3333",
+			"description": "Shop API"
+		}
+	],
+	"paths": {
+		"/users": {
+			"post": {
+				"summary": "Cadastro de usuário",
+				"description": "Rota responsável por cadastrar usuário usando nome, e-mail e senha.",
+				"tags": [
+					"Users"
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							},
+							"examples": {
+								"user": {
+									"value": {
+										"name": "Leandro",
+										"email": "leandro@email.com",
+										"password": "123456"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"400": {
+						"description": "Endereço de e-mail já está sendo usado.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sessions": {
+			"post": {
+				"summary": "Login de usuário",
+				"description": "Rota responsável por fazer login usando e-mail e senha.",
+				"tags": [
+					"Users"
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthCredentials"
+							},
+							"examples": {
+								"auth-credentials": {
+									"value": {
+										"email": "leandro@email.com",
+										"password": "123456"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"401": {
+						"description": "E-mail ou senha incorretos.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"user": {
+											"type": "object",
+											"$ref": "#/components/schemas/User"
+										},
+										"token": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/products": {
+			"post": {
+				"summary": "Cadastro de produto",
+				"description": "Rota responsável por cadastrar produto usando nome, preço, estoque e tags.",
+				"tags": [
+					"Products"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Product"
+							},
+							"examples": {
+								"product": {
+									"value": {
+										"title": "ReactJS",
+										"link": "https://github.com/facebook/react/",
+										"description": "Javascript Library by Facebook",
+										"tags": [
+											"js",
+											"ts",
+											"node"
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"401": {
+						"description": "Usuário não está autenticado.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Product"
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"summary": "Listagem de produtos por tags",
+				"description": "Rota responsável por listar produtos filtrando por tags.",
+				"tags": [
+					"Products"
+				],
+				"parameters": [
+					{
+						"name": "tag",
+						"in": "query",
+						"description": "Nome da Tag usada para filtrar os produtos"
+					}
+				],
+				"responses": {
+					"400": {
+						"description": "Informe uma tag para buscar os produtos.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Product"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/products/{id}": {
+			"delete": {
+				"summary": "Excluir produto por id",
+				"description": "Rota responsável por excluir produto pelo id informado",
+				"tags": [
+					"Products"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Id do produto a ser excluída",
+						"required": true
+					}
+				],
+				"responses": {
+					"400": {
+						"description": "Id do produto não informado.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Usuário não está autenticado.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "A produto informada não existe.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"User": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				}
+			},
+			"AuthCredentials": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			"Product": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"link": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"Error": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "number"
+					},
+					"message": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	}
+}
