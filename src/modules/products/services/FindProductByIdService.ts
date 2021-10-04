@@ -1,9 +1,7 @@
 import AppError from '@shared/errors/AppError';
 import { container, inject, injectable } from 'tsyringe';
-import IProductDTO from '../dtos/IProductDTO';
 import Product from '../infra/typeorm/entities/Product';
 import IProductsRepository from '../repositories/IProductsRepository';
-import FormatProductService from './utils/FormatProductsService';
 import FormatTagService from './utils/FormatTagsService';
 
 @injectable()
@@ -23,6 +21,10 @@ class FindProductByIdService {
 
         Object.assign(product, {
             tags: tags,
+            creator: {
+                id: product.creator.id,
+                name: product.creator.name,
+            }
         })
 
         return product;

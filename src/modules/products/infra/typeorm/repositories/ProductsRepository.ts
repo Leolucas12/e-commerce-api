@@ -1,6 +1,7 @@
 import ICreateProductDTO from '@modules/products/dtos/ICreateProductDTO';
 import Product from '@modules/products/infra/typeorm/entities/Product';
 import IProductsRepository from '@modules/products/repositories/IProductsRepository';
+import User from '@modules/users/infra/typeorm/entities/User';
 import { getRepository, Like, Repository } from 'typeorm';
 
 class ProductsRepository implements IProductsRepository {
@@ -74,6 +75,14 @@ class ProductsRepository implements IProductsRepository {
       .leftJoin('product.tags', 'tags')
       .where('product.id = :productId', { productId: id })
       .getOne();
+
+    if (product !== undefined) {
+      product.creator = await this.ormRepository
+        .createQueryBuilder()
+        .relation(Product, "creator")
+        .of(product)
+        .loadOne() as User;
+    }
 
     return product;
   }
