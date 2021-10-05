@@ -39,7 +39,7 @@ class UpdateProductService {
       name,
       price,
       inventory,
-      productTags
+      tags: productTags
     })
 
     await this.productsRepository.update(product);
